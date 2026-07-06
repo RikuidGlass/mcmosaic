@@ -212,25 +212,27 @@ def cmd_video_alpha(args: argparse.Namespace) -> None:
 # argparse wiring
 # ---------------------------------------------------------------------------
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="mcmosaic", description="Turn images/videos into Minecraft block-texture mosaics")
-    p.add_argument("--blocks-dir", default="blocks", help="folder to auto-populate/read block textures from (default: blocks)")
-    p.add_argument("--mc-version", default=None, help="Minecraft version to pull textures from if none are found locally (default: latest release)")
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--blocks-dir", default="blocks", help="folder to auto-populate/read block textures from (default: blocks)")
+    common.add_argument("--mc-version", default=None, help="Minecraft version to pull textures from if none are found locally (default: latest release)")
+
+    p = argparse.ArgumentParser(prog="mcmosaic", description="Turn images/videos into Minecraft block-texture mosaics", parents=[common])
     sub = p.add_subparsers(dest="command", required=True)
 
-    p_img = sub.add_parser("image", help="convert a single image")
+    p_img = sub.add_parser("image", help="convert a single image", parents=[common])
     p_img.add_argument("input")
     p_img.add_argument("output")
     p_img.add_argument("--width", type=int, default=144)
     p_img.set_defaults(func=cmd_image)
 
-    p_vid = sub.add_parser("video", help="convert a video, keeping its audio")
+    p_vid = sub.add_parser("video", help="convert a video, keeping its audio", parents=[common])
     p_vid.add_argument("input")
     p_vid.add_argument("output")
     p_vid.add_argument("--width", type=int, default=144)
     p_vid.add_argument("--no-audio", action="store_true", help="skip the ffmpeg audio merge step")
     p_vid.set_defaults(func=cmd_video)
 
-    p_alpha = sub.add_parser("video-alpha", help="convert a green-screen video to a transparent PNG frame sequence")
+    p_alpha = sub.add_parser("video-alpha", help="convert a green-screen video to a transparent PNG frame sequence", parents=[common])
     p_alpha.add_argument("input")
     p_alpha.add_argument("--frames-dir", default="frames")
     p_alpha.add_argument("--width", type=int, default=144)
