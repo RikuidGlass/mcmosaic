@@ -1,0 +1,18 @@
+[project]
+name = "mcmosaic"
+version = "0.1.0"
+description = "Convert images and videos into Minecraft block-texture mosaics"
+requires-python = ">=3.9"
+dependencies = [
+    "opencv-python",
+    "numpy",
+    "Pillow",
+    "tqdm",
+]
+
+[project.scripts]
+mcmosaic = "mcmosaic.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
