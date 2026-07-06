@@ -109,12 +109,15 @@ def ensure_blocks(out_dir: str = "blocks", mc_version: str | None = None, force:
 
     print(f"[blocks_fetch] '{out_dir}' has no textures yet, looking for them...")
 
-    for _mtime, jar in _find_local_jars():
-        if _extract_from_jar(jar, out_dir):
-            print(f"[blocks_fetch] extracted textures from local install: {jar}")
-            return out_dir
+    if mc_version is None:
+        for _mtime, jar in _find_local_jars():
+            if _extract_from_jar(jar, out_dir):
+                print(f"[blocks_fetch] extracted textures from local install: {jar}")
+                return out_dir
+    else:
+        print(f"[blocks_fetch] a specific version ({mc_version}) was requested, skipping local jar scan")
 
-    print("[blocks_fetch] no usable local Minecraft jar found, downloading the official client jar from Mojang...")
+    print(f"[blocks_fetch] downloading the official client jar from Mojang ({mc_version or 'latest release'})...")
     jar = _download_version_jar(mc_version)
     if _extract_from_jar(jar, out_dir):
         print(f"[blocks_fetch] extracted textures from downloaded jar: {jar}")
