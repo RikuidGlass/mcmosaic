@@ -15,15 +15,15 @@ echo "==> Creating virtual environment (venv/)..."
 python3 -m venv venv
 source venv/bin/activate
 
-echo "==> Installing mcmosaic + Python dependencies..."
+echo "==> Installing mosaithon + Python dependencies..."
 pip install --upgrade pip
 pip install -e .
 
 echo ""
 echo "Setup complete. Next steps:"
 echo "  source venv/bin/activate"
-echo "  mcmosaic image input.png output.png"
-echo "  mcmosaic video input.mp4 output.mp4"
-echo "  mcmosaic video-alpha input.mp4 --frames-dir frames"
+echo "  mosaithon image input.png output.png"
+echo "  mosaithon video input.mp4 output.mp4"
+echo "  mosaithon video-alpha input.mp4 --frames-dir frames"
 echo ""
-echo "blocks/ is fetched automatically on first run -- nothing to set up by hand."
+echo "blocks/ must be populated manually with .png textures before running commands."
