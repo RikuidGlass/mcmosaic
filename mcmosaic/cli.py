@@ -19,7 +19,7 @@ from .core import average_color, closest_block, load_blocks  # noqa: F401 (avera
 # image
 # ---------------------------------------------------------------------------
 def cmd_image(args: argparse.Namespace) -> None:
-    ensure_blocks(args.blocks_dir)
+    ensure_blocks(args.blocks_dir, mc_version=args.mc_version)
     block_images, block_names, avg_colors_array, block_size = load_blocks(args.blocks_dir)
     block_w, block_h = block_size
 
@@ -62,7 +62,7 @@ def _process_frame_full(args_tuple):
 
 
 def cmd_video(args: argparse.Namespace) -> None:
-    ensure_blocks(args.blocks_dir)
+    ensure_blocks(args.blocks_dir, mc_version=args.mc_version)
     block_images, block_names, avg_colors_array, block_size = load_blocks(args.blocks_dir)
 
     cap = cv2.VideoCapture(args.input)
@@ -167,7 +167,7 @@ def _process_frame_alpha(args_tuple):
 
 
 def cmd_video_alpha(args: argparse.Namespace) -> None:
-    ensure_blocks(args.blocks_dir)
+    ensure_blocks(args.blocks_dir, mc_version=args.mc_version)
     block_images, block_names, avg_colors_array, block_size = load_blocks(args.blocks_dir)
     os.makedirs(args.frames_dir, exist_ok=True)
 
@@ -213,9 +213,10 @@ def cmd_video_alpha(args: argparse.Namespace) -> None:
 # ---------------------------------------------------------------------------
 def build_parser() -> argparse.ArgumentParser:
     common = argparse.ArgumentParser(add_help=False)
-    common.add_argument("--blocks-dir", default="blocks", help="folder containing block texture PNGs (default: blocks)")
+    common.add_argument("--blocks-dir", default="blocks", help="folder to auto-populate/read block textures from (default: blocks)")
+    common.add_argument("--mc-version", default=None, help="Minecraft version to pull textures from if none are found locally (default: latest release)")
 
-    p = argparse.ArgumentParser(prog="mosaithon", description="Turn images/videos into Minecraft block-texture mosaics", parents=[common])
+    p = argparse.ArgumentParser(prog="mcmosaic", description="Turn images/videos into Minecraft block-texture mosaics", parents=[common])
     sub = p.add_subparsers(dest="command", required=True)
 
     p_img = sub.add_parser("image", help="convert a single image", parents=[common])
