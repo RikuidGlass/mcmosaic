@@ -18,10 +18,20 @@ time you run any command:
 Either way, nothing gets committed to the repo — `blocks/` stays gitignored
 and just gets rebuilt on demand.
 
-## Setup
+## Install
 
 ```bash
-git clone <your repo url>
+pip install git+https://github.com/RikuidGlass/mcmosaic
+```
+
+This installs the `mcmosaic` command along with its dependencies
+(`opencv-python`, `numpy`, `Pillow`, `tqdm`). `ffmpeg` is still required
+separately for `mcmosaic video` (see Setup below if you don't have it).
+
+## Setup (for development)
+
+```bash
+git clone https://github.com/RikuidGlass/mcmosaic
 cd mcmosaic
 ./setup.sh
 source venv/bin/activate
