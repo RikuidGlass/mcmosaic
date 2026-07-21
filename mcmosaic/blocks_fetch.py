@@ -17,15 +17,64 @@ from a game install they already own.
 """
 from __future__ import annotations
 
+import io
 import json
 import os
 import platform
-import shutil
 import sys
 import urllib.request
 import zipfile
 
+from PIL import Image
+
 VERSION_MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
+
+# Block textures whose filenames don't correspond to a full opaque cube even
+# though the PNG itself happens to be fully opaque (slabs, stairs, doors,
+# signs, torches, buttons, pressure plates, rails, etc. all reuse a full
+# block's texture image but aren't full cubes themselves). This is a
+# best-effort denylist by name fragment since shape can't be derived from
+# the texture image alone.
+_NON_CUBE_NAME_HINTS = (
+    "slab", "stairs", "door", "trapdoor", "fence", "wall", "sign", "torch",
+    "button", "pressure_plate", "rail", "carpet", "candle", "lantern",
+    "campfire", "bed", "banner", "chain", "ladder", "vine", "bars",
+    "grate", "coral_fan", "flower_pot", "head", "skull", "lily_pad",
+    "sapling", "seagrass", "kelp", "web", "chorus_plant", "chorus_flower",
+)
+
+# Non-block-cube utility textures that live in the same folder but should
+# never be treated as a paintable block color.
+_EXCLUDED_FILENAMES = {"debug.png", "debug2.png"}
+
+_REQUIRED_SIZE = (16, 16)
+
+
+def _is_fully_opaque(png_bytes: bytes) -> bool:
+    """True if the PNG has no translucent/transparent pixels at all."""
+    try:
+        img = Image.open(io.BytesIO(png_bytes)).convert("RGBA")
+    except Exception:
+        return False
+    alpha = img.getchannel("A")
+    lo, hi = alpha.getextrema()
+    return lo == 255  # every pixel fully opaque
+
+
+def _is_correct_size(png_bytes: bytes) -> bool:
+    """True if the PNG is exactly 16x16 (rejects animated sheets like 16x64, etc.)."""
+    try:
+        img = Image.open(io.BytesIO(png_bytes))
+        return img.size == _REQUIRED_SIZE
+    except Exception:
+        return False
+
+
+def _looks_like_full_cube(name: str) -> bool:
+    if name.lower() in _EXCLUDED_FILENAMES:
+        return False
+    lowered = name.lower()
+    return not any(hint in lowered for hint in _NON_CUBE_NAME_HINTS)
 
 
 def _candidate_launcher_dirs() -> list[str]:
@@ -78,11 +127,26 @@ def _extract_from_jar(jar_path: str, out_dir: str) -> bool:
             if not names:
                 return False
             os.makedirs(out_dir, exist_ok=True)
+            extracted = 0
+            skipped = 0
             for n in names:
-                target = os.path.join(out_dir, os.path.basename(n))
-                with z.open(n) as src, open(target, "wb") as dst:
-                    shutil.copyfileobj(src, dst)
-            return True
+                base = os.path.basename(n)
+                if not _looks_like_full_cube(base):
+                    skipped += 1
+                    continue
+                data = z.read(n)
+                if not _is_correct_size(data):
+                    skipped += 1
+                    continue
+                if not _is_fully_opaque(data):
+                    skipped += 1
+                    continue
+                target = os.path.join(out_dir, base)
+                with open(target, "wb") as dst:
+                    dst.write(data)
+                extracted += 1
+            print(f"[blocks_fetch] kept {extracted} full opaque 16x16 cube textures, skipped {skipped} (transparent, wrong size, non-cube, or debug)")
+            return extracted > 0
     except zipfile.BadZipFile:
         return False
 
