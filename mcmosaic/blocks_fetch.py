@@ -41,6 +41,7 @@ _NON_CUBE_NAME_HINTS = (
     "campfire", "bed", "banner", "chain", "ladder", "vine", "bars",
     "grate", "coral_fan", "flower_pot", "head", "skull", "lily_pad",
     "sapling", "seagrass", "kelp", "web", "chorus_plant", "chorus_flower",
+    "dried_ghast", "test", "jigsaw", "_bottom", "_side",
 )
 
 # Non-block-cube utility textures that live in the same folder but should

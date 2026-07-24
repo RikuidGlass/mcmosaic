@@ -21,7 +21,7 @@ and just gets rebuilt on demand.
 ## Install
 
 ```bash
-pip install git+https://github.com/RikuidGlass/mcmosaic
+pip install git+https://github.com/x96-64/mcmosaic
 ```
 
 This installs the `mcmosaic` command along with its dependencies
@@ -31,7 +31,7 @@ separately for `mcmosaic video` (see Setup below if you don't have it).
 ## Setup (for development)
 
 ```bash
-git clone https://github.com/RikuidGlass/mcmosaic
+git clone https://github.com/x96-64/mcmosaic
 cd mcmosaic
 ./setup.sh
 source venv/bin/activate
@@ -54,7 +54,7 @@ mcmosaic video input.mp4 output.mp4
 mcmosaic video-alpha input.mp4 --frames-dir frames
 
 # force a specific Minecraft version's textures (default: latest release)
-mcmosaic image input.png output.png --mc-version 26.1.2
+mcmosaic image input.png output.png --mc-version 26.2
 
 # use a different blocks folder / mosaic width (default width: 72)
 mcmosaic video input.mp4 output.mp4 --blocks-dir my_blocks --width 200
